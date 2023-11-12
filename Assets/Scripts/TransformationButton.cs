@@ -12,6 +12,7 @@ public class TransformationButton : MonoBehaviour
     public string transformation;
     public Texture2D texture;
     public bool active;
+    public Image imageIndicator;
 
     private void Start()
     {

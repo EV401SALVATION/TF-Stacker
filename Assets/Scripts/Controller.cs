@@ -2,24 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.IO;
 
 public class Controller : MonoBehaviour
 {
     // Transformation Stack
     private TransformationNode head = null;
-
-    // Initial Transformation
-    private string firstTF = null;
+    private int transformationCount;
 
     [Header("Folder Paths")]
     public string databasePath;
     public string characterImagesPath;
     public string transformationIconsPath;
 
-    [Header("Image Paths")]
+    [Header("Image Path")]
     public string imagePath;
-    public string defaultImagePath;
 
     [Header("Names")]
     public string characterName;
@@ -36,25 +34,33 @@ public class Controller : MonoBehaviour
     [Header("Lists")]
     public string[] transformations;
     public Button[] transformationButtons;
+    public TMP_Text[] transformationTextElements;
 
     // Transforms the character.
     public void TransformCharacter(string transformation)
     {
         // Push a transformation onto the stack.
-        Debug.Log("Transforming into: " + transformation);
         PushTransformation(transformation);
 
+        // Update the image indicators.
+        UpdateImageIndicators();
+
+        // Update the transformation text stack
+        transformationTextElements[transformationCount - 1].text = transformation;
+        transformationTextElements[transformationCount - 1].gameObject.SetActive(true);
+
         // Update the character's image.
-        string trueImagePath = imagePath + ".png";
-        UpdateCharacterImage(trueImagePath);
+        UpdateCharacterImage(imagePath + ".png");
     }
 
     // Undoes the most recent transformation.
     public void UndoTransformation()
     {
+        // Update the transformation text stack
+        transformationTextElements[transformationCount - 1].gameObject.SetActive(false);
+
         // Pop the most recent transformation from the stack.
         string tf = PopTransformation();
-        Debug.Log("Undoing transformation: " + tf);
 
         // Re-enable that transformation's button.
         for (int i = 0; i < transformationButtons.Length; i++)
@@ -65,36 +71,33 @@ public class Controller : MonoBehaviour
             }
         }
 
+        // Update the image indicators.
+        UpdateImageIndicators();
+
         // Update the character's image.
-        string trueImagePath = imagePath + ".png";
-        UpdateCharacterImage(trueImagePath);
+        UpdateCharacterImage(imagePath + ".png");
     }
 
     // Pushes a transformation onto the stack.
     public void PushTransformation(string transformation)
     {
+        // If this is the first transformation in the stack, show the undo button.
         if (head == null)
-        {
-            // If this is the first transformation in the stack, save it and update the image path accordingly. Also show the undo button.
-            firstTF = transformation;
             undoButton.gameObject.SetActive(true);
-            imagePath = characterImagesPath + "\\" + firstTF + "\\" + characterName + "%" + firstTF;
-        }
-        else
-        {
-            // If this is a subsequent transformation, just update the image path.
-            imagePath = imagePath + "%" + transformation;
-        }
+
+        // Update the image path
+        imagePath = imagePath + "%" + transformation;
 
         // Add a new TransformationNode to the stack.
         TransformationNode newNode = new TransformationNode(transformation);
         newNode.next = head;
         head = newNode;
+        transformationCount += 1;
+        if (transformationCount > 10)
+            transformationCount = 10;
 
         // Print debug information to the console.
         Debug.Log("Pushed transformation: " + head.transformation);
-        Debug.Log("Initial transformation: " + firstTF);
-        Debug.Log("Image Path: " + imagePath + ".png");
     }
 
     // Pops a transformation from the stack.
@@ -107,18 +110,16 @@ public class Controller : MonoBehaviour
         // Update the image path.
         imagePath = imagePath.Remove((imagePath.Length - (returnTF.Length + 1)), (returnTF.Length + 1));
 
-        // Check if the tf stack is empty, and if it is hide the undo button and update the path accordingly.
+        // If stack is emptied, hide the undo button.
         if (head == null)
-        {
-            firstTF = null;
-            imagePath = characterImagesPath + "\\" + characterName;
             undoButton.gameObject.SetActive(false);
-        }
+
+        transformationCount -= 1;
+        if (transformationCount < 0)
+            transformationCount = 0;
 
         // Print debug information to the console.
         Debug.Log("Popped transformation: " + returnTF);
-        Debug.Log("Initial transformation: " + firstTF);
-        Debug.Log("Image Path: " + imagePath + ".png");
         return returnTF;
     }
 
@@ -139,6 +140,26 @@ public class Controller : MonoBehaviour
             Debug.Log("Error: Image \"" + newImagePath + "\" could not be found.");
         }
 
+    }
+
+    // Updates the image indicators for the different transformation buttons.
+    public void UpdateImageIndicators()
+    {
+        for (int i = 0; i < transformationButtons.Length; i++)
+        {
+            if (transformationButtons[i].enabled == true)
+            {
+                // Get the transformation button component.
+                TransformationButton tfButton = transformationButtons[i].gameObject.GetComponent<TransformationButton>();
+
+                // Check whether to enable the transformation button's image indicator.
+                string nextImagePath = imagePath + "%" + tfButton.transformation + ".png";
+                if (System.IO.File.Exists(nextImagePath))
+                    tfButton.imageIndicator.enabled = true;
+                else
+                    tfButton.imageIndicator.enabled = false;
+            }
+        }
     }
 }
 

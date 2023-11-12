@@ -10,15 +10,19 @@ public class Startup : MonoBehaviour
 {
     private string errorMessage;
 
-    [Header("Primary game controller.")]
+    [Header("Primary Game Controller")]
     public Controller controller;
 
-    [Header("Start menu UI elements.")]
+    [Header("Start Menu UI Elements")]
     public Button startButton;
     public TMP_InputField pathInput;
     public TMP_Text errorText;
 
-    [Header("Placeholder sprite.")]
+    [Header("Database/Author Name Elements")]
+    public TMP_Text characterNameText;
+    public TMP_Text authorNameText;
+
+    [Header("Placeholder Sprite")]
     public Sprite imageMissing;
 
     private void Start()
@@ -49,16 +53,17 @@ public class Startup : MonoBehaviour
             DisplayErrorText();
             return;
         }
-        if (CheckTransformationFolders() == false)
-        {
-            DisplayErrorText();
-            return;
-        }
 
-        // All preparation and checking finished, start game.
+        // Hide start screen elements.
         errorText.enabled = false;
         startButton.gameObject.SetActive(false);
         pathInput.gameObject.SetActive(false);
+
+        // Show gameplay elements.
+        characterNameText.text = controller.characterName;
+        characterNameText.gameObject.SetActive(true);
+        authorNameText.text = controller.authorName;
+        authorNameText.gameObject.SetActive(true);
         SetupDefaultImage();
         SetupTransformationButtons();
     }
@@ -212,25 +217,11 @@ public class Startup : MonoBehaviour
         }
     }
 
-    // Checks if all of the initial transformation subfolders exist in the Character_Images folder.
-    bool CheckTransformationFolders()
-    {
-        for (int i = 0; i < controller.transformations.Length; i++)
-        {
-            if (System.IO.Directory.Exists(controller.characterImagesPath + "\\" + controller.transformations[i]) == false)
-            {
-                errorMessage = "Error: \"" + controller.transformations[i] + "\" folder in the \"Character_Images\" folder not found.";
-                return false;
-            }
-        }
-        return true;
-    }
-
     // Sets the starting image for the character, and also saves the path to it in the Controller for easy access.
     void SetupDefaultImage()
     {
-        controller.defaultImagePath = controller.characterImagesPath + "\\" + controller.characterName + ".png";
-        controller.UpdateCharacterImage(controller.defaultImagePath);
+        controller.imagePath = controller.characterImagesPath + "\\" + controller.characterName;
+        controller.UpdateCharacterImage(controller.imagePath + ".png");
     }
 
     // Sets up the transformations and icons for each button and enables them per the Transformations.txt file.
@@ -240,7 +231,8 @@ public class Startup : MonoBehaviour
         {
             // Set the button's transformation.
             string tf = controller.transformations[i];
-            controller.transformationButtons[i].GetComponent<TransformationButton>().transformation = tf;
+            Button transformationButton = controller.transformationButtons[i];
+            transformationButton.GetComponent<TransformationButton>().transformation = tf;
 
             // Set the path to the button's icon.
             string iconPath = controller.transformationIconsPath + "\\" + tf + ".png";
@@ -261,7 +253,10 @@ public class Startup : MonoBehaviour
             }
 
             // Enable the button.
-            controller.transformationButtons[i].gameObject.SetActive(true);
+            transformationButton.gameObject.SetActive(true);
+
+            // Update the image indicators.
+            controller.UpdateImageIndicators();
         }
     }
 
