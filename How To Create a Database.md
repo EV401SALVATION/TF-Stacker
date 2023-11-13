@@ -2,7 +2,7 @@
 Creating a database for TF Stacker is incredibly easy! Just follow these steps and you'll have your own version of TF Stacker running in no time! You can refer to the demo database in the Databases folder for an example of a correctly prepared database whenever you need.
 
 1. Download the database template zip file.
-    You can find this under the Databases folder. Just click the file named "Database_Template_V1.zip", and then click the little download button shown on the top left of the area with the blue "View raw" text to download it. Unpack it wherever you want, and you're ready to start setting up your database!
+    You can find this in the latest release of the game, as well as in the Databases folder. Unpack it wherever you want, and you're ready to start setting up your database!
     The database template comes with a folder named "Character_Images" and a folder named "Transformation_Icons", as well as a "Names.txt" file and a "Transformations.txt" file.
 
 2. Name your database.
