@@ -24,12 +24,15 @@ public class Controller : MonoBehaviour
     public string authorName;
 
     [Header("Object References")]
-    public SpriteRenderer characterSprite;
+    public Image characterImage;
     public Button undoButton;
 
-    [Header("Useful Image Storage")]
+    [Header("Image References")]
     public Texture2D defaultTexture;
     public Sprite imageMissing;
+    public Sprite tfButtonBackground;
+    public Sprite undoIcon;
+    public Sprite exitIcon;
 
     [Header("Lists")]
     public string[] transformations;
@@ -132,14 +135,13 @@ public class Controller : MonoBehaviour
             byte[] fileData = File.ReadAllBytes(newImagePath);
             texture.LoadImage(fileData);
 
-            characterSprite.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            characterImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
         }
         catch
         {
-            characterSprite.sprite = imageMissing;
+            characterImage.sprite = imageMissing;
             Debug.Log("Error: Image \"" + newImagePath + "\" could not be found.");
         }
-
     }
 
     // Updates the image indicators for the different transformation buttons.

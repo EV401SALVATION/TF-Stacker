@@ -1,0 +1,20 @@
+Background:
+179
+175
+255
+Bottom Bar:
+30
+7
+80
+Text:
+179
+175
+255
+TF Button Text:
+179
+175
+255
+Transformation Text:
+30
+7
+80
