@@ -10,14 +10,16 @@ public class Startup : MonoBehaviour
 {
     private string errorMessage;
     private bool hasIconsFolder;
-    private bool usingDefaultColors;
+    private bool hasBackgrounds;
+    private bool hasMusic;
 
     [Header("Primary Game Controller")]
     public Controller controller;
 
     [Header("Start Menu UI Elements")]
-    public Button startButton;
+    public Image titleLogo;
     public TMP_InputField pathInput;
+    public Button startButton;
     public TMP_Text errorText;
 
     [Header("Gameplay Elements")]
@@ -29,6 +31,10 @@ public class Startup : MonoBehaviour
     public TMP_Text versionText;
     public Button undoButton;
     public Button exitButton;
+    public Button muteButton;
+    public Button leftArrowButton;
+    public Button rightArrowButton;
+    public AudioSource audioSource;
 
     [Header("Placeholder Sprite")]
     public Sprite imageMissing;
@@ -42,6 +48,9 @@ public class Startup : MonoBehaviour
 
     private void Start()
     {
+        hasIconsFolder = false;
+        hasBackgrounds = false;
+        hasMusic = false;
         startButton.onClick.AddListener(StartGame);
     }
 
@@ -75,11 +84,14 @@ public class Startup : MonoBehaviour
             return;
         }
         GetImageOverrides();
+        GetBackgrounds();
+        GetMusic();
 
         // Hide start screen elements.
         errorText.enabled = false;
-        startButton.gameObject.SetActive(false);
+        titleLogo.gameObject.SetActive(false);
         pathInput.gameObject.SetActive(false);
+        startButton.gameObject.SetActive(false);
 
         // Set gameplay colors.
         SetColors();
@@ -93,9 +105,25 @@ public class Startup : MonoBehaviour
         characterImage.gameObject.SetActive(true);
         characterNameText.gameObject.SetActive(true);
         authorNameText.gameObject.SetActive(true);
+        if (hasMusic)
+            muteButton.gameObject.SetActive(true);
+        if (hasBackgrounds)
+        {
+            leftArrowButton.gameObject.SetActive(true);
+            rightArrowButton.gameObject.SetActive(true);
+        }
         SetupImageOverrides();
         SetupDefaultImage();
         SetupTransformationButtons();
+
+        // Play background music
+        if (hasMusic)
+        {
+            Debug.Log("Playing music...");
+            audioSource.clip = controller.backgroundMusic;
+            audioSource.gameObject.SetActive(true);
+            audioSource.Play();
+        }
     }
 
     // Displays an error message to the start menu and to the console.
@@ -144,10 +172,7 @@ public class Startup : MonoBehaviour
         // Check for Transformation_Icons folder.
         controller.transformationIconsPath = controller.databasePath + "\\Transformation_Icons";
         if (System.IO.Directory.Exists(controller.transformationIconsPath) == false)
-        {
             Debug.Log("\"Transformation_Icons\" folder not found. Using default icons.");
-            hasIconsFolder = false;
-        }
         else
             hasIconsFolder = true;
 
@@ -381,7 +406,6 @@ public class Startup : MonoBehaviour
             catch
             {
                 Debug.Log("Unable to read file \"Colors.txt\". Using default colors.");
-                usingDefaultColors = true;
                 reader.Close();
                 return true;
             }
@@ -393,7 +417,6 @@ public class Startup : MonoBehaviour
         catch
         {
             Debug.Log("Could not load file \"Colors.txt\". Using default colors.");
-            usingDefaultColors = true;
             return true;
         }
     }
@@ -463,6 +486,38 @@ public class Startup : MonoBehaviour
             controller.exitIcon = image;
         else
             Debug.Log("Image \"" + path + "\" could not be found, using default.");
+
+        // Mute Icon Image
+        path = controller.databasePath + "\\Mute_Icon.png";
+        image = GetImage(path);
+        if (image != null)
+            controller.muteIcon = image;
+        else
+            Debug.Log("Image \"" + path + "\" could not be found, using default.");
+
+        // Unmute Icon Image
+        path = controller.databasePath + "\\Unmute_Icon.png";
+        image = GetImage(path);
+        if (image != null)
+            controller.unmuteIcon = image;
+        else
+            Debug.Log("Image \"" + path + "\" could not be found, using default.");
+
+        // Left Arrow Image
+        path = controller.databasePath + "\\Left_Arrow.png";
+        image = GetImage(path);
+        if (image != null)
+            controller.leftArrow = image;
+        else
+            Debug.Log("Image \"" + path + "\" could not be found, using default.");
+
+        // Right Arrow Image
+        path = controller.databasePath + "\\Right_Arrow.png";
+        image = GetImage(path);
+        if (image != null)
+            controller.rightArrow = image;
+        else
+            Debug.Log("Image \"" + path + "\" could not be found, using default.");
     }
 
     // Return an Sprite from an image at the given path, or null if the image doesn't exist.
@@ -487,6 +542,147 @@ public class Startup : MonoBehaviour
     {
         undoButton.gameObject.GetComponent<Image>().sprite = controller.undoIcon;
         exitButton.gameObject.GetComponent<Image>().sprite = controller.exitIcon;
+        muteButton.gameObject.GetComponent<Image>().sprite = controller.muteIcon;
+        leftArrowButton.gameObject.GetComponent<Image>().sprite = controller.leftArrow;
+        rightArrowButton.gameObject.GetComponent<Image>().sprite = controller.rightArrow;
+    }
+
+    void GetBackgrounds()
+    {
+        // Check for Backgrounds folder.
+        controller.backgroundsPath = controller.databasePath + "\\Backgrounds";
+        if (System.IO.Directory.Exists(controller.backgroundsPath) == false)
+        {
+            Debug.Log("\"Backgrounds\" folder not found.");
+            return;
+        }
+
+        // Check for Backgrounds.txt file.
+        try
+        {
+            string path = controller.backgroundsPath + "/Backgrounds.txt";
+            StreamReader reader = new StreamReader(path);
+            try
+            {
+                // Get the number of backgrounds listed in the Backgrounds.txt file.
+                string backgroundCountText = reader.ReadLine();
+                if (int.TryParse(backgroundCountText, out int backgroundCount) == false)
+                    Debug.Log("Background count must be a non-decimal number!");
+
+                // If the background count isn't greater than zero, don't do backgrounds.
+                if (backgroundCount < 1) return;
+
+                controller.backgroundCount = backgroundCount;
+                hasBackgrounds = true;
+            }
+            catch
+            {
+                Debug.Log("Unable to read file \"Backgrounds.txt\".");
+            }
+        }
+        catch
+        {
+            Debug.Log("Could not load file \"Backgrounds.txt\". File may be missing from the database.");
+        }
+        
+    }
+    
+    // Gets the music if it exists in the database. Supports .wav, .mp3, and .ogg files.
+    void GetMusic()
+    {
+        string musicPath = controller.databasePath + "\\Music.";
+        WWW www;
+        AudioClip clip;
+
+        // WAV
+        try
+        {
+            // Check if the file exists.
+            byte[] fileData = File.ReadAllBytes(musicPath + "wav");
+
+            // Read from the file.
+            www = new WWW(musicPath + "wav");
+            clip = www.GetAudioClip();
+            clip.LoadAudioData();
+
+            // Wait until the clip is loaded.
+            while (clip.loadState != AudioDataLoadState.Loaded && clip.loadState != AudioDataLoadState.Failed) ;
+            
+            // Print and return on load failed.
+            if (clip.loadState == AudioDataLoadState.Failed)
+            {
+                Debug.Log("Failed to load \"Music.wav\".");
+                return;
+            }
+
+            // Print on successful load.
+            Debug.Log("Loaded \"Music.wav\".");
+        }
+        catch
+        {
+            // MP3
+            Debug.Log("Unable to load \"Music.wav\", trying \"Music.mp3\"...");
+            try
+            {
+                // Check if the file exists.
+                byte[] fileData = File.ReadAllBytes(musicPath + "mp3");
+
+                // Read from the file.
+                www = new WWW(musicPath + "mp3");
+                clip = www.GetAudioClip();
+                clip.LoadAudioData();
+
+                // Wait until the clip is loaded.
+                while (clip.loadState != AudioDataLoadState.Loaded && clip.loadState != AudioDataLoadState.Failed) ;
+
+                // Print and return on load failed.
+                if (clip.loadState == AudioDataLoadState.Failed)
+                {
+                    Debug.Log("Failed to load \"Music.mp3\".");
+                    return;
+                }
+
+                // Print on successful load.
+                Debug.Log("Loaded \"Music.mp3\".");
+            }
+            catch
+            {
+                // OGG
+                Debug.Log("Unable to load \"Music.mp3\", trying \"Music.ogg\"...");
+                try
+                {
+                    // Check if the file exists.
+                    byte[] fileData = File.ReadAllBytes(musicPath + "ogg");
+
+                    // Read from the file.
+                    www = new WWW(musicPath + "ogg");
+                    clip = www.GetAudioClip();
+                    clip.LoadAudioData();
+
+                    // Wait until the clip is loaded.
+                    while (clip.loadState != AudioDataLoadState.Loaded && clip.loadState != AudioDataLoadState.Failed) ;
+
+                    // Print and return on load failed.
+                    if (clip.loadState == AudioDataLoadState.Failed)
+                    {
+                        Debug.Log("Failed to load \"Music.ogg\".");
+                        return;
+                    }
+
+                    // Print on successful load.
+                    Debug.Log("Loaded \"Music.ogg\".");
+                }
+                catch
+                {
+                    Debug.Log("Unable to load \"Music.ogg\".");
+                    return;
+                }
+            }
+        }
+
+        clip.name = "Background Music";
+        controller.backgroundMusic = clip;
+        hasMusic = true;
     }
 
     // Sets the starting image for the character, and also saves the path to it in the Controller for easy access.

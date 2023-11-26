@@ -10,11 +10,14 @@ public class Controller : MonoBehaviour
     // Transformation Stack
     private TransformationNode head = null;
     private int transformationCount;
+    private int currentBackgroundID = 0;
+    private bool musicMuted = false;
 
     [Header("Folder Paths")]
     public string databasePath;
     public string characterImagesPath;
     public string transformationIconsPath;
+    public string backgroundsPath;
 
     [Header("Image Path")]
     public string imagePath;
@@ -25,7 +28,10 @@ public class Controller : MonoBehaviour
 
     [Header("Object References")]
     public Image characterImage;
+    public Image backgroundImage;
     public Button undoButton;
+    public Button muteButton;
+    public AudioSource audioSource;
 
     [Header("Image References")]
     public Texture2D defaultTexture;
@@ -33,11 +39,21 @@ public class Controller : MonoBehaviour
     public Sprite tfButtonBackground;
     public Sprite undoIcon;
     public Sprite exitIcon;
+    public Sprite muteIcon;
+    public Sprite unmuteIcon;
+    public Sprite leftArrow;
+    public Sprite rightArrow;
+
+    [Header("Audio References")]
+    public AudioClip backgroundMusic;
 
     [Header("Lists")]
     public string[] transformations;
     public Button[] transformationButtons;
     public TMP_Text[] transformationTextElements;
+
+    [Header("Other Variables")]
+    public int backgroundCount;
 
     // Transforms the character.
     public void TransformCharacter(string transformation)
@@ -161,6 +177,89 @@ public class Controller : MonoBehaviour
                 else
                     tfButton.imageIndicator.enabled = false;
             }
+        }
+    }
+
+    // Increment the background image when the right arrow is pressed.
+    public void IncrementBackground()
+    {
+        currentBackgroundID++;
+        if (currentBackgroundID > backgroundCount)
+        {
+            currentBackgroundID = 0;
+        }
+
+        // If the ID is 0 (default no background), disable the background image.
+        if (currentBackgroundID == 0)
+        {
+            backgroundImage.gameObject.SetActive(false);
+            return;
+        }
+        else
+        {
+            backgroundImage.sprite = GetBackgroundImage(currentBackgroundID);
+            backgroundImage.gameObject.SetActive(true);
+        }
+    }
+
+    // Decrement the background image when the left arrow is pressed.
+    public void DecrementBackground()
+    {
+        currentBackgroundID--;
+        if (currentBackgroundID < 0)
+        {
+            currentBackgroundID = backgroundCount;
+        }
+
+        // If the ID is 0 (default no background), disable the background image.
+        if (currentBackgroundID == 0)
+        {
+            backgroundImage.gameObject.SetActive(false);
+            return;
+        }
+        else
+        {
+            backgroundImage.sprite = GetBackgroundImage(currentBackgroundID);
+            backgroundImage.gameObject.SetActive(true);
+        }
+    }
+
+    // Tries to get the background image corresponding to the given ID from the database.
+    public Sprite GetBackgroundImage(int ID)
+    {
+        // Set the path for the background image.
+        string backgroundImagePath = backgroundsPath + "\\Background_" + ID.ToString() + ".png";
+
+        // Try to get the image, and return the placeholder if it can't be found.
+        try
+        {
+            Texture2D texture = new Texture2D(2, 2);
+            byte[] fileData = File.ReadAllBytes(backgroundImagePath);
+            texture.LoadImage(fileData);
+
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
+        catch
+        {
+            Debug.Log("Error: Image \"" + backgroundImagePath + "\" could not be found.");
+            return imageMissing;
+        }
+    }
+
+    // Toggle music mute.
+    public void ChangeMute()
+    {
+        if (musicMuted == false)
+        {
+            audioSource.volume = 0;
+            muteButton.image.sprite = unmuteIcon;
+            musicMuted = true;
+        }
+        else
+        {
+            audioSource.volume = 1;
+            muteButton.image.sprite = muteIcon;
+            musicMuted = false;
         }
     }
 }

@@ -1,4 +1,18 @@
 ----------Changelog----------
+[v1.0.0] (11/26/23)
+- Added support for backgrounds.
+    - Backgrounds can be added to a Backgrounds folder and cycled through during gameplay.
+    - The left and right arrow buttons are also customizable in databases.
+    - See the "How To Create a Database" file for more information.
+- Added support for a single background music track.
+    - You can have a background music track play during gameplay, and even mute and unmute it.
+    - The mute button's two icons are also customizable in databases.
+    - See the "How To Create a Database" file for more information.
+- Enhanced the startup screen with a new title logo, start button, and reorganization.
+- Added an icon for the game.
+- Updated the Draden Demo to V4 database to showcase the new features.
+- Updated the README and "How To Create a Database" files.
+
 [v0.3.0] (11/18/23)
 - Reorganized the user interface.
 - If a transformation button does not have an icon specified, it will show text for the transformation instead. The transformation icons folder is now optional.

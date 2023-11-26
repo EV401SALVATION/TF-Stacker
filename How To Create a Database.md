@@ -31,6 +31,10 @@ Creating a database for TF Stacker is incredibly easy! Just follow these steps a
     - Image_Missing.png (1280x1280)
     - Transformation_Button_Background.png (256x256)
     - Undo_Icon.png (256x256)
+    - Left_Arrow.png (256x256)
+    - Right_Arrow.png (256x256)
+    - Mute_Icon.png (256x256)
+    - Unmute_Icon.png (256x256)
     - Exit_Icon.png (256x256)
 
    [TIP] You can have transparent transformation button backgrounds by putting a fully transparent PNG file named "Transformation_Button_Background.png" into your database's main folder!
@@ -45,6 +49,14 @@ Creating a database for TF Stacker is incredibly easy! Just follow these steps a
     All of these images are placed into the "Character_Images" folder.
 
     Once again, if a transformation image is missing, the game will display it with the placeholder. As the number of these images quickly skyrockets the more TFs are added, it's only natural that many combinations won't have images.
+
+7. [OPTIONAL] Add background images.
+    You can add background images to be displayed behind the character too! To do this, you'll first need to create a sub-folder called "Backgrounds" in the database's folder. Inside that folder create a text file called "Backgrounds.txt", and in this text file put a single non-decimal number greater than 0. This will define how many backgrounds will be in this database.
+    Once that is done, you can start adding the backgrounds! These should be square images, and while the exact size doesn't matter I'd recommend something around 1280x1280 pixels. Each of these images must be named "Background_#.png" ("Background_1.png", "Background_2.png", etc.). The number in each of these names must be a non-decimal number greater than 0. Any missing backgrounds will be displayed with the same placeholder image as is used with the character, so you can specify the number of backgrounds you plan to have at first and add them at your leisure.
+
+8. [OPTIONAL] Add background music.
+    TF Stacker also supports a single background music track for each database! Supported file types are wav, mp3, and ogg. To add a music track, simply name it "Music.wav", "Music.mp3", or "Music.ogg" (depending on what type of file it is) and put it into the main database folder.
+    [TIP] If you want to have multiple music tracks that cycle, you can simple stich together multiple songs into a single file to have a repeating playlist of music in the game!
 
 7. [OPTIONAL] Customize the game's color pallette.
     You can fully customize the color pallete of the game! To do this, you'll need to put a file named "Colors.txt" into your database's main folder. An example of the "Colors.txt" file from the Draden Demo is shown below.
@@ -82,5 +94,9 @@ Sometimes the structure of databases will change when TF Stacker is updated. Her
 
 [v0.1.0 to v0.2.0]
 1. The initial transformation subfolders were removed following this version, so all transformation images need to be moved from them into the base "Character_Images" folder.
+
 [v0.2.0 to v0.3.0]
+No changes necessary.
+
+[v0.3.0 to v1.0.0]
 No changes necessary.
