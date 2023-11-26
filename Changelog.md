@@ -1,4 +1,5 @@
 ----------Changelog----------
+
 [v1.0.0] (11/26/23)
 - Added support for backgrounds.
     - Backgrounds can be added to a Backgrounds folder and cycled through during gameplay.
