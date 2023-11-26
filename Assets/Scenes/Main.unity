@@ -1393,7 +1393,7 @@ MonoBehaviour:
   bottomBarColor: {r: 0.13725491, g: 0.22352941, b: 0.36862746, a: 1}
   textColor: {r: 0, g: 0, b: 0, a: 1}
   tfButtonTextColor: {r: 0, g: 0, b: 0, a: 1}
-  transformationTextColor: {r: 0, g: 0, b: 0, a: 0}
+  transformationTextColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &494698158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3638,8 +3638,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 100, y: 70}
-  m_SizeDelta: {x: 200, y: 25}
+  m_AnchoredPosition: {x: 125, y: 70}
+  m_SizeDelta: {x: 250, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1404289169
 MonoBehaviour:
@@ -3691,8 +3691,8 @@ MonoBehaviour:
   m_fontSize: 25
   m_fontSizeBase: 25
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 1
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -4500,8 +4500,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 100, y: 30}
-  m_SizeDelta: {x: 200, y: 25}
+  m_AnchoredPosition: {x: 125, y: 30}
+  m_SizeDelta: {x: 250, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1882782366
 MonoBehaviour:
@@ -4555,8 +4555,8 @@ MonoBehaviour:
   m_fontSize: 25
   m_fontSizeBase: 25
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 1
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1

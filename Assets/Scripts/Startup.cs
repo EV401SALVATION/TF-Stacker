@@ -400,7 +400,7 @@ public class Startup : MonoBehaviour
                     errorMessage = "Error: Invalid value for transformation text color b (line 20 of Colors.txt).";
                     return false;
                 }
-                transformationTextColor = new Color(r, g, b);
+                transformationTextColor = new Color(r, g, b, 1);
                 Debug.Log("Transformation Text Color: " + tfButtonTextColor.r + ", " + tfButtonTextColor.g + ", " + tfButtonTextColor.b);
             }
             catch
